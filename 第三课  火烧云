@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第三课 火烧云｜听写生词字卡</title>
+<style>
+:root{
+  --bg1: #e8f9e9;
+  --bg2: #f6fff6;
+  --card-bg-front: #e6fff1;
+  --card-bg-back: #ffffff;
+  --btn-bg: #1e90ff;
+  --btn-text: #fff;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;height:100%;font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:linear-gradient(180deg,var(--bg1),var(--bg2));color:#233;}
+.header{text-align:center;padding:14px 12px;font-size:18px;background:#b8e4c9;font-weight:600;box-shadow:0 2px 6px rgba(0,0,0,0.08);}
+.wrapper{min-height:calc(100vh - 140px);display:flex;align-items:center;justify-content:center;padding:16px;padding-bottom:140px;}
+.card-area{width:92%;max-width:460px;display:flex;justify-content:center;align-items:center;}
+.card{width:100%;max-width:420px;height:320px;perspective:1200px;position:relative;user-select:none;}
+.inner{width:100%;height:100%;position:relative;transition:transform 0.75s cubic-bezier(.2,.9,.3,1);transform-style: preserve-3d;}
+.card.flipped .inner{transform: rotateY(180deg) scale(1.05);}
+.face{position:absolute;inset:0;border-radius:20px;box-shadow:0 8px 20px rgba(0,0,0,0.12);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;}
+.front{background: var(--card-bg-front);}
+.back{background: var(--card-bg-back);transform: rotateY(180deg);}
+.pinyin{font-size:48px;line-height:1.0;color:#2a9d66;letter-spacing:2px;text-align:center;word-break:break-word;padding:6px 8px;font-weight:600;}
+.speaker-btn{margin-top:10px;background:transparent;border:none;width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;}
+.speaker-btn:active{transform:scale(0.98);}
+.speaker-icon{width:26px;height:26px;fill: #1e90ff;}
+.lesson{position:absolute;right:14px;bottom:12px;font-size:13px;color:#666;}
+.word{font-family:"KaiTi","SimKai","楷体";font-size:34px;color:#111;margin-bottom:6px;text-align:center;word-break:break-word;}
+.meaning{font-size:20px;color:green;margin-bottom:10px;text-align:center;}
+.sentence{font-family:"KaiTi","SimKai","楷体";font-size:17px;color:#333;text-align:center;padding:0 8px;line-height:1.35;}
+.sentence .speak-inline{margin-left:8px;vertical-align:middle;}
+.translation{margin-top:6px;font-size:15px;color:#555;text-align:center;}
+.nav{position:fixed;left:0;right:0;bottom:18px;display:flex;flex-direction:column;justify-content:center;pointer-events: auto;}
+.nav-inner{display:flex;gap:20px;align-items:center;justify-content:center;background:rgba(255,255,255,0.0);padding:6px 12px;}
+.nav button{background:var(--btn-bg);color:var(--btn-text);border:none;padding:12px 22px;border-radius:12px;font-size:16px;box-shadow:0 6px 16px rgba(30,144,255,0.18);cursor:pointer;}
+.nav button:active{transform:translateY(1px);}
+.counter{margin-top:6px;text-align:center;font-size:13px;color:#444;}
+.dots span{display:inline-block;width:10px;height:10px;margin:0 4px;border-radius:50%;background:#c0c0c0;transition:all 0.3s;}
+.dots span.active{background:#1e90ff;transform:scale(1.3);}
+@media(max-width:420px){
+  .card { height:360px; border-radius:18px; }
+  .pinyin { font-size:54px; }
+  .word { font-size:36px; }
+  .meaning { font-size:18px; }
+  .sentence { font-size:18px; }
+  .nav button { padding:12px 18px; font-size:17px; border-radius:14px; }
+  .dots span { width:12px; height:12px; margin:0 3px; }
+  .header { font-size:16px; padding:12px 8px; }
+}
+</style>
+</head>
+<body>
+<div class="header">第三课 火烧云｜听写生词字卡</div>
+<div class="wrapper">
+  <div class="card-area" aria-live="polite">
+    <div class="card" id="card" role="button" aria-pressed="false" tabindex="0" aria-label="单张字卡">
+      <div class="inner" id="inner"></div>
+    </div>
+  </div>
+</div>
+<div class="nav" role="navigation" aria-label="卡片导航">
+  <div class="nav-inner">
+    <button id="prevBtn" aria-label="上一页">⬅ 上一张</button>
+    <div class="counter" id="counter">1 / 19</div>
+    <button id="nextBtn" aria-label="下一页">下一张 ➡</button>
+  </div>
+  <div class="dots" id="dotsContainer"></div>
+</div>
+
+<script>
+const words=[
+{word:"火烧云", pinyin:"huǒ shāo yún", meaning:"evening fiery clouds", sentence:"傍晚的天空出现了美丽的火烧云。", en:"Beautiful fiery clouds appeared in the evening sky."},
+{word:"胡子", pinyin:"hú zi", meaning:"mustache", sentence:"爷爷的胡子很长。", en:"Grandpa's mustache is very long."},
+{word:"笑眯眯", pinyin:"xiào mī mī", meaning:"smiling", sentence:"奶奶笑眯眯地看着我。", en:"Grandma looked at me with a smiling face."},
+{word:"红彤彤", pinyin:"hóng tóng tóng", meaning:"bright red", sentence:"苹果红彤彤的，很好看。", en:"The apple is bright red and very pretty."},
+{word:"寺庙", pinyin:"sì miào", meaning:"temple", sentence:"我们去寺庙参观。", en:"We visited the temple."},
+{word:"一模一样", pinyin:"yì mú yí yàng", meaning:"exactly the same", sentence:"他们穿了一模一样的衣服。", en:"They wore exactly the same clothes."},
+{word:"模糊", pinyin:"mó hu", meaning:"not clear", sentence:"远处的山看起来很模糊。", en:"The mountains in the distance look unclear."},
+{word:"等待", pinyin:"děng dài", meaning:"waiting", sentence:"我们在车站等待巴士。", en:"We are waiting for the bus at the station."},
+{word:"福如东海寿比南山", pinyin:"fú rú dōnghǎi shòu bǐ nánshān", meaning:"long life and boundless happiness", sentence:"我们祝爷爷福如东海，寿比南山。", en:"We wish Grandpa long life and boundless happiness."},
+{word:"惊奇", pinyin:"jīng qí", meaning:"surprised/amazed", sentence:"小朋友对魔术表演感到惊奇。", en:"The kids were amazed by the magic show."},
+{word:"好像", pinyin:"hǎo xiàng", meaning:"seem/be like", sentence:"天空好像下雨了。", en:"It seems like it's going to rain."},
+{word:"颜色", pinyin:"yán sè", meaning:"colour", sentence:"这幅画的颜色很漂亮。", en:"The colors in this painting are very beautiful."},
+{word:"寻找", pinyin:"xún zhǎo", meaning:"look for", sentence:"小猫在寻找它的尾巴。", en:"The kitten is looking for its tail."},
+{word:"尾巴", pinyin:"wěi bā", meaning:"tail", sentence:"小狗的尾巴摇来摇去。", en:"The puppy's tail is wagging."},
+{word:"脖子", pinyin:"bó zi", meaning:"neck", sentence:"她脖子上戴着一条项链。", en:"She is wearing a necklace on her neck."},
+{word:"偏偏", pinyin:"piān piān", meaning:"against all odds", sentence:"下雨了，我偏偏忘了带雨伞。", en:"It rained, and against all odds, I forgot to bring my umbrella."},
+{word:"镇静", pinyin:"zhèn jìng", meaning:"calm", sentence:"遇到问题时，他很镇静。", en:"He stays calm when facing problems."},
+{word:"似乎", pinyin:"sì hū", meaning:"seems like/as if", sentence:"他似乎不太舒服，脸色有些苍白。", en:"He seems unwell; his face looks a bit pale."},
+{word:"从天而降", pinyin:"cóng tiān ér jiàng", meaning:"come down from the sky", sentence:"看着从天而降的雨水，他突然有了灵感。", en:"Watching the rain come down from the sky, he suddenly got an idea."}
+];
+
+let currentIndex=0;
+const card=document.getElementById("card");
+const inner=document.getElementById("inner");
+const counter=document.getElementById("counter");
+const dotsContainer=document.getElementById("dotsContainer");
+
+function renderCard(){
+  const w=words[currentIndex];
+  inner.innerHTML=`
+    <div class="face front">
+      <div class="pinyin">${w.pinyin}</div>
+      <button class="speaker-btn" onclick="speakPinyin('${w.word}', event)">
+        <svg class="speaker-icon" viewBox="0 0 24 24"><path d="M5 9v6h4l5 5V4l-5 5H5z"/></svg>
+      </button>
+      <div class="lesson">第三课 火烧云</div>
+    </div>
+    <div class="face back">
+      <div class="word">${w.word}</div>
+      <div class="meaning">${w.meaning}</div>
+      <div class="sentence">${w.sentence}<button class="speaker-btn speak-inline" onclick="speakSentence('${w.sentence}', event)">
+        <svg class="speaker-icon" viewBox="0 0 24 24"><path d="M5 9v6h4l5 5V4l-5 5H5z"/></svg>
+      </button></div>
+      <div class="translation">${w.en}</div>
+      <div class="lesson">第三课 火烧云</div>
+    </div>
+  `;
+  updateCounter();
+}
+
+function updateCounter(){
+  counter.textContent=`${currentIndex+1} / ${words.length}`;
+  dotsContainer.innerHTML=words.map((_,i)=>`<span class="${i===currentIndex?'active':''}"></span>`).join('');
+}
+
+function nextCard(){currentIndex=(currentIndex+1)%words.length;renderCard();}
+function prevCard(){currentIndex=(currentIndex-1+words.length)%words.length;renderCard();}
+document.getElementById("nextBtn").addEventListener("click",nextCard);
+document.getElementById("prevBtn").addEventListener("click",prevCard);
+
+// 点击空白翻面
+card.addEventListener("click",(e)=>{
+  if(!e.target.closest(".speaker-btn")){
+    card.classList.toggle("flipped");
+  }
+});
+
+// 播放拼音中文朗读
+function speakPinyin(text,event){
+  if(event) event.stopPropagation();
+  const utter=new SpeechSynthesisUtterance(text);
+  utter.lang="zh-CN";utter.rate=0.5;speechSynthesis.speak(utter);
+}
+
+// 播放造句中文朗读
+function speakSentence(text,event){
+  if(event) event.stopPropagation();
+  const utter=new SpeechSynthesisUtterance(text);
+  utter.lang="zh-CN";utter.rate=0.6;speechSynthesis.speak(utter);
+}
+
+renderCard();
+</script>
+</body>
+</html>
